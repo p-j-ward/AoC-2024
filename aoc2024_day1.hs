@@ -13,7 +13,7 @@ main = do
     let rightList = sort (map last inputPairs)
 
     -- part1: we want the sum total of the (magnitude of the) elementwise differences
-    let diffs = map (\x -> (fst x) - (snd x)) (zip leftList rightList)
+    let diffs = zipWith (-) leftList rightList
     let ans1 = sum (map abs diffs)
 
     -- part2: similarity score, the sum total of - each number in the left list, multiplied by the number of times it appears in the right list
