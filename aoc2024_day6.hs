@@ -18,7 +18,7 @@ zipperLeft (zl, v, zr) =
 zipperRight :: ZipperList a -> Maybe (ZipperList a)
 zipperRight (zl, v, zr) =
     case zr of
-        [] -> Nothing -- right list is empty, can't go left any further
+        [] -> Nothing -- right list is empty, can't go right any further
         x:xs -> Just (v:zl, x, xs)
 
 zipperToList :: ZipperList a -> [a]
