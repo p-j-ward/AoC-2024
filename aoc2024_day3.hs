@@ -35,9 +35,44 @@ sumValidMatches str acc =
             Just (x,y) -> sumValidMatches (tail str) (acc + (x*y))
             Nothing    -> sumValidMatches (tail str) acc
 
+-- part 2
+matchDoStateMachine :: Int -> [Char] -> Bool
+matchDoStateMachine stateNum str = 
+    case stateNum of
+        0 -> (head str == 'd') && matchDoStateMachine 1 (tail str)
+        1 -> (head str == 'o') && matchDoStateMachine 2 (tail str)
+        2 -> (head str == '(') && matchDoStateMachine 3 (tail str)
+        3 -> head str == ')'
+
+matchDontStateMachine :: Int -> [Char] -> Bool
+matchDontStateMachine stateNum str = 
+    case stateNum of
+        0 -> (head str == 'd') && matchDontStateMachine 1 (tail str)
+        1 -> (head str == 'o') && matchDontStateMachine 2 (tail str)
+        2 -> (head str == 'n') && matchDontStateMachine 3 (tail str)
+        3 -> (head str == '\'') && matchDontStateMachine 4 (tail str)
+        4 -> (head str == 't') && matchDontStateMachine 5 (tail str)
+        5 -> (head str == '(') && matchDontStateMachine 6 (tail str)
+        6 -> head str == ')'
+
+sumMatchesWithEnable :: [Char] -> Int -> Bool -> Int
+sumMatchesWithEnable str acc mulEnabled
+    | null str = acc
+    | mulEnabled && matchDontStateMachine 0 str = sumMatchesWithEnable (tail str) acc False   -- disable mul
+    | mulEnabled =
+            case matchStateMachine 0 str 0 0 of
+                Just (x,y) -> sumMatchesWithEnable (tail str) (acc + (x*y)) True
+                Nothing    -> sumMatchesWithEnable (tail str) acc True
+    | otherwise =
+            -- if !mulEnabled, see if the next instruction matches a do()
+            sumMatchesWithEnable (tail str) acc (matchDoStateMachine 0 str)
+
 main = do
     -- read input
     inputString <- readFile "input_day3.txt"
 
     let ans1 = sumValidMatches inputString 0
-    print ans1
+    let ans2 = sumMatchesWithEnable inputString 0 True
+    print ans1  -- 159892596
+    print ans2  -- 92626942
+    
