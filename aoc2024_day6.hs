@@ -25,31 +25,33 @@ zipperToList :: ZipperList a -> [a]
 zipperToList (zl, v, zr) = reverse zl ++ (v : zr)
 
 -- 2D list zipper functions
-zipper2Select :: ([ZipperList a], ZipperList a, [ZipperList a]) -> a
+type ZipperList2 a = ZipperList (ZipperList a)
+
+zipper2Select :: ZipperList2 a -> a
 zipper2Select (zl, v, zr) = zipperSelect v
 
-zipper2Set :: ZipperList (ZipperList a) -> a -> ZipperList (ZipperList a)
+zipper2Set :: ZipperList2 a -> a -> ZipperList2 a
 zipper2Set (zl, v, zr) newVal = (zl, zipperSet v newVal, zr)
 
-zipper2Up :: ZipperList (ZipperList a) -> Maybe (ZipperList (ZipperList a))
+zipper2Up :: ZipperList2 a -> Maybe (ZipperList2 a)
 zipper2Up = zipperLeft
 
-zipper2Down :: ZipperList (ZipperList a) -> Maybe (ZipperList (ZipperList a))
+zipper2Down :: ZipperList2 a -> Maybe (ZipperList2 a)
 zipper2Down = zipperRight
 
-zipper2Left :: ZipperList (ZipperList a) -> Maybe (ZipperList (ZipperList a))
+zipper2Left :: ZipperList2 a -> Maybe (ZipperList2 a)
 zipper2Left (zl, v, zr) = do
     newZl <- traverse zipperLeft zl
     newV  <- zipperLeft v
     newZr <- traverse zipperLeft zr
     return (newZl, newV, newZr)
 
-zipper2Right :: ZipperList (ZipperList a) -> Maybe (ZipperList (ZipperList a))
+zipper2Right :: ZipperList2 a -> Maybe (ZipperList2 a)
 zipper2Right (zl, v, zr) = do
     newZl <- traverse zipperRight zl
     newV  <- zipperRight v
     newZr <- traverse zipperRight zr
     return (newZl, newV, newZr)
 
-zipper2ToList :: ZipperList (ZipperList a) -> [[a]]
+zipper2ToList :: ZipperList2 a -> [[a]]
 zipper2ToList z = map zipperToList (zipperToList z)
