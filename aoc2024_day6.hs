@@ -1,4 +1,48 @@
 -- Advent of Code 2024, Day 6
+-- reads input from input_day6.txt, prints results to console
+
+import Data.Maybe
+
+data GuardDirection = UpDir | RightDir | DownDir | LeftDir
+
+rotateGuard :: GuardDirection -> GuardDirection
+rotateGuard dir =
+    case dir of
+        UpDir    -> RightDir
+        RightDir -> DownDir
+        DownDir  -> LeftDir
+        LeftDir  -> UpDir
+
+directionAsFunc :: GuardDirection -> ZipperList2 Char -> Maybe (ZipperList2 Char)
+directionAsFunc UpDir    = zipper2Up
+directionAsFunc RightDir = zipper2Right
+directionAsFunc DownDir  = zipper2Down
+directionAsFunc LeftDir  = zipper2Left
+
+guardStep :: (GuardDirection, ZipperList2 Char) -> (GuardDirection, Maybe (ZipperList2 Char))
+guardStep (dir, z) = 
+    let newPos = directionAsFunc dir z in  -- current position is valid, but next position may not be (if guard out of boudns)
+        case newPos of
+            Nothing -> (dir, Nothing)
+            Just validPos -> if '#' == zipper2Select validPos then (rotateGuard dir, Just (zipper2Set z 'X')) else (dir, Just (zipper2Set validPos 'X'))
+
+
+
+main = do
+    inputString <- readFile "input_day6.txt"
+    let inputData = lines inputString :: [[Char]]
+    let initZipper = list2ToZipper inputData
+
+    -- we'll cheat by knowing the inital guard position is line 44, col 53
+    let line44 = let down 1 zd = fromJust $ zipper2Down zd
+                     down nb zd = down (nb-1) (fromJust $ zipper2Down zd)
+                 in down 43 initZipper
+    let findGuard = let across 1 za = fromJust $ zipper2Right za
+                        across na za = across (na-1) (fromJust $ zipper2Right za)
+                    in across 52 line44
+
+    print $ zipperSelect findGuard
+
 
 -- 1D list zipper functions
 type ZipperList a = ([a], a, [a])
