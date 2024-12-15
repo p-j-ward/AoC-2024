@@ -7,9 +7,8 @@ tryEqn ::  Int -> [Int] -> Int -> Bool
 tryEqn result eqn n = result == foldl (\acc (x,newOp) -> newOp acc x) (head eqn) (zip (tail eqn) (createOpList n))
 
 eqnSatisfiable :: (Int, [Int]) -> Bool
-eqnSatisfiable (result, eqns) = any (tryEqn result eqns) [1..2^length eqns]
+eqnSatisfiable (result, terms) = any (tryEqn result terms) [1..2^length terms]
 
--- input to this function is of the form [(target val, [eqn nums]), ...]
 sumValidCalibrations :: [(Int, [Int])] -> Int
 sumValidCalibrations testList = sum (map fst (filter eqnSatisfiable testList))
 
