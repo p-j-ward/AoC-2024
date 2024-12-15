@@ -4,7 +4,7 @@
 import Data.List
 
 numDigits :: Integer -> Integer
-numDigits x = let divd = div x 10 in (if divd == 0 then 1 else 1 + numDigits divd)
+numDigits = floor . log . fromInteger
 
 splitStone :: Integer -> Integer -> [Integer]
 splitStone x digs = let p = 10 ^ div digs 2 in [div x p, mod x p]
