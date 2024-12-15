@@ -10,7 +10,7 @@ zipperSet :: ZipperList a -> a -> ZipperList a
 zipperSet (zl, v, zr) newVal = (zl, newVal, zr)
 
 zipperLeft :: ZipperList a -> Maybe (ZipperList a)
-zipperLeft (zl, v, zr) = 
+zipperLeft (zl, v, zr) =
     case zl of
         [] -> Nothing -- left list is empty, can't go left any further
         x:xs -> Just (xs, x, v:zr)
@@ -23,6 +23,9 @@ zipperRight (zl, v, zr) =
 
 zipperToList :: ZipperList a -> [a]
 zipperToList (zl, v, zr) = reverse zl ++ (v : zr)
+
+listToZipper :: [a] -> ZipperList a
+listToZipper lst = ([], head lst, tail lst)
 
 -- 2D list zipper functions
 type ZipperList2 a = ZipperList (ZipperList a)
@@ -55,3 +58,6 @@ zipper2Right (zl, v, zr) = do
 
 zipper2ToList :: ZipperList2 a -> [[a]]
 zipper2ToList z = map zipperToList (zipperToList z)
+
+list2ToZipper :: [[a]] -> ZipperList2 a
+list2ToZipper lst2 = ([], listToZipper (head lst2), map listToZipper (tail lst2))
