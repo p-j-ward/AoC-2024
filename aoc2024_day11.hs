@@ -54,7 +54,31 @@ addStoneCounts x y
 multiplyStoneCount :: Integer -> StoneCount -> StoneCount
 multiplyStoneCount mul = map (\(n,c) -> (n,mul*c))
 
+totalStoneCount :: StoneCount -> Integer
+totalStoneCount stones = sum (map snd stones)
+
 -- now we can implement the actual blinking operation on the stone count
 blinkSingleStoneToCount :: (Integer, Integer) -> StoneCount
 blinkSingleStoneToCount (s, c) = multiplyStoneCount c (stoneListToCount (blinkSingleStone s))
 
+blinkStoneCount :: StoneCount -> StoneCount
+blinkStoneCount stones = foldl addStoneCounts [] (map blinkSingleStoneToCount stones)
+
+blinkNStoneCount :: StoneCount -> Int -> StoneCount
+blinkNStoneCount stones n =
+    case n of
+        0 -> stones
+        1 -> blinkStoneCount stones
+        _ -> blinkNStoneCount (blinkStoneCount stones) (n - 1)
+
+main = do
+    -- read and parse input into list
+    inputString <- readFile "input_day11.txt"
+    let inputList = map read (words (head (lines inputString)))  :: [Integer]
+
+    let initStoneCounts = stoneListToCount inputList
+    let ans1 = totalStoneCount (blinkNStoneCount initStoneCounts 25)
+    let ans2 = totalStoneCount (blinkNStoneCount initStoneCounts 75)
+
+    print ans1  -- 198075
+    print ans2  -- 235571309320764
