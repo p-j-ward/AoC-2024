@@ -19,14 +19,22 @@ directionAsFunc RightDir = zipper2Right
 directionAsFunc DownDir  = zipper2Down
 directionAsFunc LeftDir  = zipper2Left
 
-guardStep :: (GuardDirection, ZipperList2 Char) -> (GuardDirection, Maybe (ZipperList2 Char))
-guardStep (dir, z) = 
-    let newPos = directionAsFunc dir z in  -- current position is valid, but next position may not be (if guard out of boudns)
+guardStep :: (GuardDirection, ZipperList2 Char, Int) -> (GuardDirection, Maybe (ZipperList2 Char), Int)
+guardStep (dir, z, crossCount) = 
+    let newPos = directionAsFunc dir z in
         case newPos of
-            Nothing -> (dir, Nothing)
-            Just validPos -> if '#' == zipper2Select validPos then (rotateGuard dir, Just (zipper2Set z 'X')) else (dir, Just (zipper2Set validPos 'X'))
+            Nothing -> (dir, Nothing, crossCount)   -- next position will not be valid, if guard stepped out of bounds
+            Just validPos -> if '#' == zipper2Select validPos then 
+                                (rotateGuard dir, Just z, crossCount)   -- if next newPos attempt is an obstacle, turn in place
+                             else if 'X' /= zipper2Select validPos then
+                                (dir, Just (zipper2Set validPos 'X'), crossCount + 1)
+                             else (dir, Just (zipper2Set validPos 'X'), crossCount)
 
-
+runGuard :: (GuardDirection, Maybe(ZipperList2 Char), Int) -> Int
+runGuard (dir, z, crossCount) = 
+    case z of
+        Nothing     -> crossCount
+        Just zValid -> runGuard (guardStep (dir, zValid, crossCount))
 
 main = do
     inputString <- readFile "input_day6.txt"
@@ -41,7 +49,11 @@ main = do
                         across na za = across (na-1) (fromJust $ zipper2Right za)
                     in across 52 line44
 
-    print $ zipperSelect findGuard
+    -- initialise the guard, crossing out the starting square (and counting that),
+    -- and run until out of bounds
+    let ans1 = runGuard (UpDir, Just (zipper2Set findGuard 'X'), 1)
+
+    print ans1  -- 5564
 
 
 -- 1D list zipper functions
