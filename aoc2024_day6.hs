@@ -25,10 +25,10 @@ guardStep (dir, z, crossCount) =
         case newPos of
             Nothing -> (dir, Nothing, crossCount)   -- next position will not be valid, if guard stepped out of bounds
             Just validPos -> if '#' == zipper2Select validPos then 
-                                (rotateGuard dir, Just z, crossCount)   -- if next newPos attempt is an obstacle, turn in place
+                                (rotateGuard dir, Just z, crossCount)                   -- if next newPos attempt is an obstacle, turn in place
                              else if 'X' /= zipper2Select validPos then
-                                (dir, Just (zipper2Set validPos 'X'), crossCount + 1)
-                             else (dir, Just (zipper2Set validPos 'X'), crossCount)
+                                (dir, Just (zipper2Set validPos 'X'), crossCount + 1)   -- step onto new square, mark it, and increment count
+                             else (dir, Just validPos, crossCount)                      -- already crossed out this square
 
 runGuard :: (GuardDirection, Maybe(ZipperList2 Char), Int) -> Int
 runGuard (dir, z, crossCount) = 
